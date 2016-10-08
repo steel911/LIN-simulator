@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lin Box Demo</title>
+  <!-- Insert this line above script imports  -->
+  <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+  <script type="text/javascript" src="./src/libs/jquery-3.1.0.js"></script>
+  <script type="text/javascript" src="./src/libs/semantic.js"></script>
+  <script type="text/javascript" src="src/libs/mustache.js"></script>
+
+  <!-- Insert this line after script imports -->
+  <script>if (window.module) module = window.module;</script>
+  <link rel="stylesheet" type="text/css" href="./src/libs/semantic.css">
+  <link rel="stylesheet" type="text/css" href="./src/libs/icon.css">
+</head>
+<body>
+<!-- Menu Bar -->
+<div class="ui attached stackable menu" id="menu-bar">
+  <div class="ui container">
+    <a class="item" id="refresh-btn">
+      <i class="refresh icon"></i> Refresh
+    </a>
+    <a class="item" id="settings-btn">
+      <i class="settings icon"></i> Settings
+    </a>
+  </div>
+</div>
+
+<div class="ui horizontal divider">
+  <i class="exchange icon"></i>
+  Device List
+</div>
+
+<!-- Device List -->
+<div class="ui raised container segment" id="device-list-segment">
+  <div class="ui cards" id="device-list">
+<!--     <div class="ui raised card">
+      <div class="content">
+        <img class="right floated avatar ui imnage" src="./assets/images/usb-icon.png">
+        <div class="header">
+          /device/portname
+        </div>
+        <div class="meta">
+          Arduino
+        </div>
+        <div class="description">
+          <p>Baudrate: 9600</p>
+        </div>
+      </div>
+      <div class="extra content">
+        <div class="ui two buttons">
+          <div class="ui basic green button ConnectBtn">Connect</div>
+        </div>
+      </div>
+    </div> -->
+
+<!--     <div class="ui card">
+      <div class="content">
+        <img class="right floated avatar ui imnage" src="./assets/images/usb-icon.png">
+        <div class="header">
+          /device/portname
+        </div>
+        <div class="meta">
+          Arduino
+        </div>
+        <div class="description">
+          <p>Serial Number: 757533138333964011C1</p>
+          <p>Baudrate: 9600</p>
+        </div>
+      </div>
+      <div class="extra content">
+        <div class="ui two buttons">
+          <div class="ui basic green button ConnectBtn">Connect</div>
+        </div>
+      </div>
+    </div> -->
+
+<!--     <div class="ui card">
+      <div class="content">
+        <img class="right floated avatar ui imnage" src="./assets/images/usb-icon.png">
+        <div class="header">
+          /device/portname
+        </div>
+        <div class="meta">
+          Arduino
+        </div>
+        <div class="description">
+          <p>Baudrate: 9600</p>
+        </div>
+      </div>
+      <div class="extra content">
+        <div class="ui two buttons">
+          <div class="ui basic green button ConnectBtn">Connect</div>
+        </div>
+      </div>
+    </div> -->
+  </div>
+</div>
+
+
+<br>
+<br>
+
+<div class="ui horizontal divider">
+  <i class="bar chart icon"></i>
+  Frame Monitor
+</div>
+<!-- Frame Monitor -->
+<div class="ui segment container" id="frame-monitor-segment">
+  <table class="ui selectable celled table">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>FrameId</th>
+        <th class="center aligned">FrameData</th>
+        <th>Checksum</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="lin-msg-table">
+<!--       <tr id="lin-msg">
+        <td id="lin-msg-timestamp">+20</td>
+        <td id="lin-msg-id">0x01</td>
+        <td id="lin-msg-data">0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08</td>
+        <td id="lin-msg-checksum">0xFF</td>
+        <td id="lin-msg-status">OK</td>
+      </tr>
+      <tr id="lin-msg">
+        <td id="lin-msg-timestamp">+20</td>
+        <td id="lin-msg-id">0x01</td>
+        <td id="lin-msg-data">0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08</td>
+        <td id="lin-msg-checksum">0xFF</td>
+        <td id="lin-msg-status">OK</td>
+      </tr>
+      <tr id="lin-msg">
+        <td id="lin-msg-timestamp">+20</td>
+        <td id="lin-msg-id">0x01</td>
+        <td id="lin-msg-data">0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08</td>
+        <td id="lin-msg-checksum">0xFF</td>
+        <td id="lin-msg-status">OK</td>
+      </tr> -->
+    </tbody>
+  </table>
+</div>
+
+<!-- template for adding a device in card view -->
+<template id="device-template">
+  <div class="ui card">
+    <div class="content">
+      <img class="right floated avatar ui imnage" src="./assets/images/usb-icon.png">
+      <div class="header">
+        {{portname}}
+      </div>
+      <div class="meta">
+        {{manufacturer}}
+      </div>
+      <div class="description">
+        <p>Serial Number: {{serial-number}}</p>
+        <p>Baudrate: {{baudrate}}</p>
+      </div>
+    </div>
+    <div class="extra content">
+      <div class="ui two buttons">
+        <div class="ui basic black button ConnectBtn" data-portname="{{portname}}">{{status}}</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- JSON device card sample -->
+<!-- {
+  "portname": "dev/portname",
+  "manufacturer": "arduino",
+  "serial-number": "757533138333964011C1",
+  "baudrate": "9600bps",
+  "status": "Connect"
+} -->
+
+<!-- template for adding a lin message in table view -->
+<template id="lin-msg-template">
+  <tr id="lin-msg">
+    <td id="lin-msg-timestamp">{{timestamp}}</td>
+    <td id="lin-msg-id">{{msg-id}}</td>
+    <td id="lin-msg-data">{{msg-data}}</td>
+    <td id="lin-msg-checksum">{{msg-checksum}}</td>
+    <td id="lin-msg-status">{{msg-status}}</td>
+  </tr>
+</template>
+
+<!-- JSON Lin message sample-->
+<!-- {
+  "timestamp": "+20",
+  "msgId": "msg-id",
+  "msgData": ["0x01", "0x02", "0x03", "0x04", "0x05", "0x06", "0x07", "0x08"],
+  "msgChecksum": "0xFF",
+  "msgStatus": "OK"
+} -->
+
+<script type="text/javascript" src="./src/index.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+// jQuery
+$(function () {
+
+  // DOM cache
+  let $devices = $('#device-list')
+  let $deviceTemplate = $('#device-template')
+  let $linMsgTemplate = $('#lin-msg-template')
+  let $linMsgTable = $('#lin-msg-table')
+
+  let $refreshBtn = $('#refresh-btn')
+
+  // jQuery funcitons
+  function $initDeviceList() {
+    SerialPort.list(function(err, ports) {
+      ports.forEach($initDevice(port))
+    })
+  }
+
+  function $initDevice(port) {
+    let serialport = {
+      "portname": port.comName,
+      "manufacturer": port.manufacturer,
+      "serial-number": port.serialNumber,
+      "baudrate": "9600bps",
+      "status": "Connect"
+    }
+    console.log('Portname: ' + port.comName)
+    console.log('Manufacturer: ' + port.manufacturer)
+    console.log('Serial Number: ' + port.serialNumber)
+    $devices.append(Mustache.render($deviceTemplate, serialport))
+  }
+
+  $initDeviceList()
+
+  $refreshBtn.on('click', function() {
+    initDeviceList()
+  })
+
+  function serialOpenCallback() {
+    isConnected = true
+    $connectBtn.remove('loading').html('Connected')
+    console.log('Serial Port Connceted')
+  }
+
+  function openSerialPort(portname) {
+    return new SerialPort(portname, {
+      baudRate: SERIAL_BAUDRATE,
+      autoOpen: true,
+      parser: SerialPort.parsers.byteDelimiter('\n')
+    }, serialOpenCallback())
+  }
+
+  $devices.delegate('.ConnectBtn', 'click', function() {
+    let $device = $(this).closest('.card')
+    let $connectBtn = $device.$('.ConnectBtn')
+    let $portname = $device.$('.header').html()
+
+    if(!isConnected) {
+      port = openSerialPort($portname)
+      $connectBtn.addClass('loading').html('Connecting')
+    } else {
+      port.close(function() {
+        isConnected = false
+        $connectBtn.removeClass('loading').html('Connect')
+      })
+    }
+  })
+
+  port.on('open', function() {})
+
+  port.on('data', function(data) {
+    console.log(JSON.parse(data))
+    $linMsgTable.append(Mustache.render($linMsgTemplate, linSampleMsg))
+  })
+
+  port.on('error', function(err) {
+    console.log('Error: ' + err.msg)
+  })
+
+})
+
+
